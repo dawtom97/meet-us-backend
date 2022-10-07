@@ -15,7 +15,7 @@ export class CreateUserDto {
     @IsEmail() 
     email:string
 
-    @IsDate()
+    @IsString()
     birthday_date: Date
 
 }
