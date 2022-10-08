@@ -19,4 +19,12 @@ export class CreateUserDto {
     @IsString()
     birthday_date: Date
 
+    @IsString()
+    @IsOptional()
+    description:string;
+
+    @IsString()
+    @IsOptional()
+    looking_for:[string];
+
 }

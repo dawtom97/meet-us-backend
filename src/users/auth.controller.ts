@@ -3,11 +3,13 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { UsersService } from './users.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private userService: UsersService
   ) {}
 
   @Post('/signup')
@@ -26,7 +28,7 @@ export class AuthController {
     return user;
   }
 
-  @Get('/user')
+  @Get('/login')
   async loginUser(@Req() request: Request) {
      const user = await this.authService.login(request.cookies)
      return user;
@@ -38,17 +40,12 @@ export class AuthController {
 
   @Get('/:email')
   findByEmail(@Param('email') email: string) {
-    return this.authService.findEmail(email);
+    return this.userService.findEmail(email);
   }
 
   @Get()
   findAllUsers() {
-    return this.authService.find();
+    return this.userService.find();
   }
 
-    // @Get('/:id')
-  // findUser(@Param('id') id: string) {
-  //   const query: any = new mongoose.Types.ObjectId(id);
-  //   return this.authService.findOne(query);
-  // }
 }
