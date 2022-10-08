@@ -29,5 +29,12 @@ import {
     find() {
       return this.userModel.find({});
     }
+
+    async update(id:number, attrs:Partial<UserDocument>) {
+        const user = await this.findOne(id);
+        if(!user) return new NotFoundException("User not found");
+        Object.assign(user,attrs);
+        const updatedUser =  new this.userModel(user);
+        return updatedUser.save()
   }
-  
+}

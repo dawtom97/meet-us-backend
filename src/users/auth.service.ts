@@ -23,7 +23,7 @@ export class AuthService {
   ) {}
 
   // Register user with some basic info
-  async signup(user: User): Promise<User> {
+  async signup(user: User,response:Response): Promise<User> {
     const found = await this.userModel.findOne({ email: user.email });
     if (found) throw new BadRequestException('Email already in use');
 
@@ -33,6 +33,8 @@ export class AuthService {
     user.password = result;
 
     const newUser = new this.userModel(user);
+    const jwt = await this.jwtService.signAsync(newUser.toJSON());
+    response.cookie('jwt', jwt, { httpOnly: true });
     return newUser.save();
   }
 
@@ -48,9 +50,10 @@ export class AuthService {
     if (storedHash === hash.toString('hex')) {
       const jwt = await this.jwtService.signAsync(user.toJSON());
       response.cookie('jwt', jwt, { httpOnly: true });
-
+      console.log(response)
       return {
         message: 'success',
+        token: jwt
       };
     } else {
       throw new BadRequestException('Incorrect password');
