@@ -35,6 +35,9 @@ export class User {
     default:[]
   })
   looking_for:[string]
+
+  @Prop()
+  refreshToken:string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

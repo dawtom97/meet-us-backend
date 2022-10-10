@@ -27,4 +27,7 @@ export class CreateUserDto {
     @IsOptional()
     looking_for:[string];
 
+    @IsString()
+    refreshToken:string
+
 }
