@@ -1,10 +1,10 @@
 import {
   Injectable,
-  NotFoundException,
   BadRequestException,
   UnauthorizedException,
   Res,
 } from '@nestjs/common';
+import {ConfigService} from '@nestjs/config'
 import { User, UserDocument } from 'src/users/models/user.models';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,6 +12,7 @@ import { randomBytes, scrypt as _scrypt } from 'crypto';
 import { promisify } from 'util';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from './users.service';
 
 const scrypt = promisify(_scrypt);
 
@@ -20,10 +21,12 @@ export class AuthService {
   constructor(
     @InjectModel('user') private userModel: Model<UserDocument>,
     private jwtService: JwtService,
+    private configService: ConfigService,
+    private usersService: UsersService
   ) {}
 
   // Register user with some basic info
-  async signup(user: User,response:Response): Promise<User> {
+  async signup(user: User, response: Response): Promise<User> {
     const found = await this.userModel.findOne({ email: user.email });
     if (found) throw new BadRequestException('Email already in use');
 
@@ -41,7 +44,7 @@ export class AuthService {
   // Login with email and password to get cookie
   async signin(email: string, password: string, response: Response) {
     const user = await this.userModel.findOne({ email: email });
-    console.log(user)
+    console.log(user);
     if (!user) throw new BadRequestException('User not found');
 
     const [salt, storedHash] = user.password.split('.');
@@ -50,10 +53,10 @@ export class AuthService {
     if (storedHash === hash.toString('hex')) {
       const jwt = await this.jwtService.signAsync(user.toJSON());
       response.cookie('jwt', jwt, { httpOnly: true });
-      console.log(response)
+      console.log(response);
       return {
         message: 'success',
-        token: jwt
+        token: jwt,
       };
     } else {
       throw new BadRequestException('Incorrect password');
@@ -72,7 +75,6 @@ export class AuthService {
       }
       //const user = await this.findOne(data._id);
       return data;
-
     } catch (err) {
       throw new UnauthorizedException('b');
     }
@@ -85,4 +87,39 @@ export class AuthService {
     };
   }
 
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    await this.usersService.update(Number(userId), {
+      refreshToken,
+    });
+  }
+
+  async getTokens(userId: string, username: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          username,
+        },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+          expiresIn: '15m',
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          username,
+        },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+          expiresIn: '7d',
+        },
+      ),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
 }
