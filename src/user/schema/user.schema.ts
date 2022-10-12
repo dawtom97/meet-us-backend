@@ -5,9 +5,9 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
-  [x: string]: any;
+  
   @Prop({required:true})
-  username: string;
+  name: string;
 
   @Prop({
     required:true
@@ -24,7 +24,7 @@ export class User {
   @Prop({
     default: Date.now(),
   })
-  date_added: Date;
+  date_added: string;
 
   @Prop({
     required:false
