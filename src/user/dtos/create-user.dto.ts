@@ -1,10 +1,8 @@
-import { Exclude } from 'class-transformer';
 import {IsDate, IsEmail, IsISO8601, IsOptional, IsString} from 'class-validator'
 
 export class CreateUserDto {
     @IsString()
     username:string;
-
 
     @IsDate()
     @IsOptional()
@@ -27,7 +25,5 @@ export class CreateUserDto {
     @IsOptional()
     looking_for:[string];
 
-    @IsString()
-    refreshToken:string
 
 }
