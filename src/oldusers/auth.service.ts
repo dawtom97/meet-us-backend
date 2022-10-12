@@ -5,7 +5,7 @@ import {
   Res,
 } from '@nestjs/common';
 import {ConfigService} from '@nestjs/config'
-import { User, UserDocument } from 'src/users/models/user.models';
+import { User, UserDocument } from 'src/oldusers/models/user.models';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { randomBytes, scrypt as _scrypt } from 'crypto';

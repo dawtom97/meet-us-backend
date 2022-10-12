@@ -2,9 +2,9 @@ import {
     Injectable,
     NotFoundException,
   } from '@nestjs/common';
-  import { UserDocument } from 'src/users/models/user.models';
   import { Model } from 'mongoose';
   import { InjectModel } from '@nestjs/mongoose';
+import { UserDocument } from './models/user.models';
   
   @Injectable({})
   export class UsersService {
