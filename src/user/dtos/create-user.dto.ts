@@ -2,7 +2,7 @@ import {IsDate, IsEmail, IsISO8601, IsOptional, IsString} from 'class-validator'
 
 export class CreateUserDto {
     @IsString()
-    username:string;
+    name:string;
 
     @IsDate()
     @IsOptional()
