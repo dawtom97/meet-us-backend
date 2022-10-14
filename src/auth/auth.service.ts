@@ -17,7 +17,7 @@ export class AuthService {
     async register(user: CreateUserDto):Promise<UserDetails | any> {
         const {email,password} = user;
         const existingUser = await this.userService.findByEmail(email);
-        if(existingUser) return new HttpException("An account with that email already exist!",HttpStatus.UNAUTHORIZED);
+        if(existingUser) throw new HttpException("An account with that email already exist!",HttpStatus.CONFLICT);
 
         const hashPassword = await this.hashPassword(password);
 
@@ -47,7 +47,7 @@ export class AuthService {
         const {email,password} = existingUser
         const user = await this.validateUser(email,password);
 
-        if(!user) return null;
+        if(!user) throw new HttpException("Credentials invalid!",HttpStatus.UNAUTHORIZED);;
 
         const jwt = await this.jwtService.signAsync({user});
         return {token:jwt};
