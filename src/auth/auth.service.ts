@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from 'src/user/dtos/create-user.dto';
@@ -17,7 +17,7 @@ export class AuthService {
     async register(user: CreateUserDto):Promise<UserDetails | any> {
         const {email,password} = user;
         const existingUser = await this.userService.findByEmail(email);
-        if(existingUser) return 'Email taken!';
+        if(existingUser) return new HttpException("An account with that email already exist!",HttpStatus.UNAUTHORIZED);
 
         const hashPassword = await this.hashPassword(password);
 
@@ -54,6 +54,14 @@ export class AuthService {
     }
 
 
+    async verifyJwt(jwt:string):Promise<{exp:number}> {
+        try {
+          const {exp} = await this.jwtService.verifyAsync(jwt) ;
+          return {exp}
+        } catch (error) {
+          throw new HttpException('Invalid JWT', HttpStatus.UNAUTHORIZED)
+        }
+    }
 
 
 }
